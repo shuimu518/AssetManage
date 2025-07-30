@@ -1,0 +1,207 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="Site-asset.master.cs" Inherits="资产管理.Site_asset" %>
+
+<!DOCTYPE html>
+
+<html>
+<head runat="server">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+    <title>顶部子菜单与数据展示系统</title>
+            <style type="text/css">
+                    body { 
+                        /*font-family: 'Segoe UI', Arial, sans-serif;*/
+                        margin: 0;padding: 0; 
+                        }
+                       /* 主容器 */
+                    .container { display: flex;   flex-direction: column; min-height: 100vh; }
+                     /*左侧主菜单*/ 
+                   .main-menu{width: 200px;  background-color: #2c3e50;   color: white; position: fixed; height: 100vh;}
+                    .main-menu-item {   padding: 14px 20px;  cursor: pointer;    border-bottom: 1px solid #34495e;  transition: background-color 0.3s;  }
+                    .main-menu-item:hover {   background-color: #34495e;  }
+                    .main-menu-item i {   margin-right: 10px;   width: 20px;   text-align: center;}
+                               /* 顶部子菜单 */
+                         .submenu-bar { background-color: #34495e;  height: 50px; margin-left: 200px;  display: flex; align-items: center;  padding: 0 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);  position: sticky;   top: 0;   z-index: 100;  }
+                        .submenu-item { color: white;text-decoration: none;   padding: 10px 15px;   margin-right: 10px; border-radius: 4px;transition: background-color 0.2s;   position: relative;   cursor: pointer;  }
+                        .submenu-item:hover {   background-color: #2980b9;  }
+                              /* 弹出菜单 */
+                        .popup-menu { display: none;position: absolute;top: 100%;left: 0; background-color: white; min-width: 160px; box-shadow: 0 2px 10px rgba(0,0,0,0.2); z-index: 1000; border-radius: 4px;}
+                        .popup-menu a {display: block;  padding: 10px 15px; color: #333;text-decoration: none;border-bottom: 1px solid #eee;}
+                        .popup-menu a:hover { background-color: #f0f0f0;}
+                                  /* 动画效果 */
+                         @keyframes fadeIn {from { opacity: 0; transform: translateY(-10px); }to { opacity: 1; transform: translateY(0); }}
+                             /* 响应式设计 */
+                          @media (max-width: 768px) { .main-menu { width: 100%;height: auto;  position: relative;   }  .submenu-bar {   margin-left: 0;   }  .content-area { margin-left: 0;  } }
+                     .submenu-item:hover .popup-menu {display: block;  animation: fadeIn 0.3s; }
+                             /* 内容区域 */
+                     .content-area { margin-left: 200px;  padding: 20px; background-color: #f5f5f5;  min-height: 100vh; }
+                        /* 数据展示区域 */
+                     .data-container {margin-top: 20px;   background-color: white;  border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);  padding: 20px;  }
+                  
+                     /* 头部Logo区域 */
+                     .header-logo {  display: flex;   align-items: center; font-size: 20px;  border-radius: 200px; padding: 5px 10px;    margin-bottom: 0px;   transition: all 0.3s ease; width: fit-content;}
+                       .logo {  text-align: center;font-size: 20px;  font-weight: 900;  padding: 0px 2px; background: linear-gradient(90deg, #0ea5e9 0%, #5eead4 100%);-webkit-background-clip: text; -webkit-text-fill-color: transparent;   }
+                       .user-display { position: absolute;    top: 20px;     right: 20px;        color: #5eead4;       font-weight: 500;       display: flex;      align-items: center;   }
+                .footer {
+                    text-align: center; margin-top: 10px; /*  color: rgba(255, 255, 255, 0.8);*/ font-size: 14px;    padding: 10px; }
+           </style>
+
+    <asp:ContentPlaceHolder ID="head" runat="server">
+    </asp:ContentPlaceHolder>
+</head>
+    <body          font-family: 'Segoe UI', Arial, sans-serif 
+         margin: 0;
+         padding: 0; >
+    <form id="form1" runat="server">
+              <div class="container">
+             
+               <!-- 左侧主菜单 -->
+                  <div class="main-menu">
+                         <%--企业logo--%>
+                         <div class="header-logo">
+                             <asp:Image ID="Image1" runat="server" ImageUrl="https://31580832.s21i.faiusr.com/4/ABUIABAEGAAglZ6PqQYogL_lywcw9wU44AY.png" Height="42px" Width="36px" />
+                            <div class="logo">  无人车管理系统  </div>
+                         </div>
+                            <div class="main-menu-item" id="mainMenu1" runat="server" onclick="setActiveMainMenu(this, 'sys')">
+                          <i class="fas fa-cog"></i>资产管理
+                      </div>
+                      <div class="main-menu-item" id="mainMenu2" runat="server" onclick="setActiveMainMenu(this, 'prod')">
+                          <i class="fas fa-box"></i>数据管理
+                      </div>
+                     </div>
+                 <!-- 顶部子菜单栏 -->
+                   <div class="submenu-bar" id="submenuBar" runat="server">      
+                       <!-- 用户信息 -->
+                           <div class="user-display">
+                               <span>欢迎, <asp:Label ID="lblUsername" runat="server" Text=""></asp:Label> </span>&nbsp
+                               <asp:Button ID="btnLogout" runat="server" Text="退出登录" CssClass="logout-btn" OnClick="btnLogout_Click"  Width="80"/>
+                           </div>
+                       <!-- 系统管理子菜单 -->
+                       <div id="sysSubmenu" class="submenu-section" style="display:none;">
+                           <div class="submenu-item">
+                                   <i class="fas fa-users"></i>车辆管理
+                                   <div class="popup-menu">
+                                       <asp:LinkButton runat="server" OnClick="ExecuteCommand" CommandArgument="sys_user_list">车辆列表</asp:LinkButton>
+                                   </div>
+                               </div>
+                               <div class="submenu-item">
+                                   <i class="fas fa-user-tag"></i>角色管理
+                                   <div class="popup-menu">
+                                       <asp:LinkButton runat="server" OnClick="ExecuteCommand" CommandArgument="sys_role_list">角色列表</asp:LinkButton>
+                                   </div>
+                               </div>
+                          </div>
+                             <!-- 产品管理子菜单 -->
+                          <div id="prodSubmenu" class="submenu-section" style="display:none;">
+                              <div class="submenu-item">
+                                  <i class="fas fa-list"></i>数据监控
+                                  <div class="popup-menu">
+                                      <asp:LinkButton runat="server" OnClick="ExecuteCommand" CommandArgument="prod_list_all">无人车数据</asp:LinkButton>
+                                  </div>
+                              </div>
+        
+                              <div class="submenu-item">
+                                  <i class="fas fa-plus"></i>数据看板
+                                  <div class="popup-menu">
+                                      <asp:LinkButton runat="server" OnClick="ExecuteCommand" CommandArgument="prod_add_single">数据分析</asp:LinkButton>
+                                  </div>
+                              </div>
+                              <div class="submenu-item">
+                                    <i class="fas fa-plus"></i>数据上传下载
+                                    <div class="popup-menu">
+                                        <asp:LinkButton runat="server" OnClick="ExecuteCommand" CommandArgument="prod_download">数据操作</asp:LinkButton>
+                                    </div>
+                                </div>
+                          </div>
+                </div>
+         
+           <!-- 内容区域 -->
+                <div class="content-area">
+                        <h2 id="contentTitle" runat="server">新吉奥资产管理</h2>
+                       <div class="command-result">
+                           <asp:Label ID="lblResult" runat="server" Text="请从左侧菜单选择操作"></asp:Label>
+                       </div>
+                    <h2 style="text-align:center;">用户信息表</h2>
+                     <asp:Label ID="lblMessage" runat="server" CssClass="message" Visible="false"></asp:Label>
+                    <!-- 数据展示区域 -->
+                        <div class="data-container">
+                            <asp:Label ID="lblDataTitle" runat="server" Text="数据列表" Font-Size="Large" Font-Bold="true"></asp:Label>
+
+                                  <asp:ContentPlaceHolder ID="MainContent" runat="server">
+
+
+                                </asp:ContentPlaceHolder>
+                            </div>
+                    </div>
+    <div>
+          </div>
+            <div class="footer">
+            <p>© 2025 无人车管理系统 | 智能交通解决方案</p>
+        </div>
+    </div>
+           
+    </form>
+                 <!-- Font Awesome 图标库 -->
+                    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+                    <!-- 引入jQuery -->
+                     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+                       <script type="text/javascript">
+                   // 设置活动主菜单并显示对应的子菜单
+                   function setActiveMainMenu(menuElement, submenuPrefix) {
+                       // 移除所有活动样式
+                       var menuItems = document.querySelectorAll('.main-menu-item');
+                       menuItems.forEach(function (item) {
+                           item.classList.remove('active-main-menu');
+                       });
+
+                       // 添加活动样式
+                       menuElement.classList.add('active-main-menu');
+
+                       // 隐藏所有子菜单
+                       var submenus = document.querySelectorAll('.submenu-section');
+                       submenus.forEach(function (submenu) {
+                           submenu.style.display = 'none';
+                       });
+
+                       // 显示对应的子菜单
+                       var submenuToShow = document.getElementById(submenuPrefix + 'Submenu');
+                       if (submenuToShow) {
+                           submenuToShow.style.display = 'flex';
+                       }
+                   }
+                       </script>
+                 <!-- 引入jQuery -->
+                 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+ 
+                 <!-- 引入jQuery UI -->
+                 <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" />
+                 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+ 
+                 <script type="text/javascript">
+                     $(function () {
+                         // 初始化所有日期选择器
+                         function initDatePickers() {
+                             $(".date-picker").datepicker({
+                                 dateFormat: "yy-mm-dd",
+                                 showButtonPanel: true,
+                                 changeMonth: true,
+                                 changeYear: true,
+                                 yearRange: "2000:2030",
+                                 onSelect: function (dateText) {
+                                     $(this).val(dateText);
+                                 }
+                             });
+                         }
+
+                         // 初始加载
+                         initDatePickers();
+
+                         // 处理GridView异步回发（如果使用UpdatePanel）
+                         if (typeof (Sys) !== 'undefined') {
+                             Sys.WebForms.PageRequestManager.getInstance().add_endRequest(function () {
+                                 initDatePickers();
+                             });
+                         }
+                     });
+                </script>
+    </body>
+</html>
